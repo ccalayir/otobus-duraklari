@@ -22,9 +22,10 @@ app.listen(port, () => {
   console.log(`sunucu http://localhost:${port} adresinde çalışıyor....`);
 });
 
-// Değişken isminin tam olarak PORT (büyük harf) olduğundan emin olalım
+
+// Buradaki PORT isminin, alttaki app.listen içindekiyle AYNI olması şart.
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Sunucu ${PORT} portunda başarıyla başlatıldı...`);
+    console.log(`Sunucu ${PORT} portunda canavar gibi çalışıyor...`);
 });
