@@ -5,10 +5,6 @@ const tasks = require("./routes/tasks");
 
 const { getAllStops, getStops } = require("./controllers/tasks");
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Sunucu ${PORT} portunda çalışıyor...`);
-});
 
 // middleware
 app.use(express.json());
@@ -24,4 +20,11 @@ app.use("/app/stops/", tasks);
 
 app.listen(port, () => {
   console.log(`sunucu http://localhost:${port} adresinde çalışıyor....`);
+});
+
+// Değişken isminin tam olarak PORT (büyük harf) olduğundan emin olalım
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Sunucu ${PORT} portunda başarıyla başlatıldı...`);
 });
