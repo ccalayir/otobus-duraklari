@@ -1,13 +1,18 @@
+const cors = require("cors"); // farklı portlardan gelen isteklerde sıkıntı yaşamamak için.
 const express = require("express");
 const app = express();
 const tasks = require("./routes/tasks");
 
 const { getAllStops, getStops } = require("./controllers/tasks");
 
-const port = 3000;
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Sunucu ${PORT} portunda çalışıyor...`);
+});
 
 // middleware
 app.use(express.json());
+app.use(cors()); // En basit ve her şeye izin veren hali budur.
 
 //routes
 app.use("/hello", (req, res) => {

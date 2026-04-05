@@ -1,152 +1,52 @@
-# 🚌 İzmir ESHOT Durak API
+# 🚍 İzmir Canlı Otobüs Takip Sistemi
 
-Bu proje, Node.js ve Express.js kullanılarak oluşturulmuş basit bir REST API sunucusudur. Sunucu, İzmir Büyükşehir Belediyesi ESHOT otobüs duraklarının bilgilerini (ID, ad, konum, geçen hatlar) içeren yerel bir `duraklar.json` dosyasını okur ve bu verileri JSON formatında sunar.
-API ayrıca, durakların enlem ve boylam bilgilerini kullanarak OpenStreetMap (Nominatim) servisi üzerinden Ters Coğrafi Kodlama (Reverse Geocoding) yapar ve durağın tam açık adresini de yanıta ekler.
+Bu proje, İzmir Büyükşehir Belediyesi (ESHOT) açık veri servislerini kullanarak tamamen vibe coding (Gemini Pro 3.1) geliştirilmiş; durak bazlı canlı otobüs takibi, harita entegrasyonu ve tahmini varış süresi hesaplayan bir **Full-Stack** web uygulamasıdır.
 
-## ✨ Temel Özellikler
+## 🚀 Öne Çıkan Özellikler
 
-* Tüm otobüs duraklarını listeleyin.
-* Belirli bir durağı `ID` ile sorgulayın.
-* Geçersiz `ID` istekleri için hata yönetimi içerir.
-* Dinamik olarak rastgele "bekleyen yolcu sayısı" bilgisi üretir (simülasyon amaçlı).
-* Koordinat (Enlem/Boylam) bilgisini kullanarak durakların tam açık adresini OpenStreetMap üzerinden getirir.
+* **Akıllı Durak Arama:** `datalist` desteği ile durak adını yazmaya başladığınızda otomatik tamamlama sunar. Aynı isimdeki durakları ID bilgisiyle birbirinden ayırır.
+* **Canlı Harita Takibi:** Seçilen durağın konumu ve o duraktan geçen aktif otobüslerin anlık yerleri [Leaflet.js](https://leafletjs.com/) haritası üzerinde gösterilir.
+* **Varış Süresi Hesaplama:** Otobüs ve durak koordinatları arasındaki mesafe **Haversine Formülü** ile hesaplanır. Ortalama hız (20km/s) baz alınarak tahmini varış süresi sunulur.
+* **Yön Bilgisi:** Otobüslerin "Gidiş" veya "Dönüş" yönünde olup olmadığı bilgisini anlık olarak verir.
+* **Detaylı Liste Görünümü:** Haritadaki ikonlara ek olarak, harita altında tüm yaklaşan otobüsler şık bir liste halinde süreleriyle birlikte gösterilir.
 
-## 🔧 Kullanılan Teknolojiler
+## 🛠️ Teknolojiler
 
-* **Node.js:** Sunucu taraflı JavaScript çalışma ortamı.
-* **Express.js:** Hızlı ve minimalist bir Node.js web uygulama çatısı.
-* **OpenStreetMap Nominatim API:** Enlem/Boylam verilerini açık adrese dönüştürmek için kullanılır (Reverse Geocoding).
+### Frontend
+* **HTML5 & Bootstrap 5:** Modern ve duyarlı (responsive) arayüz tasarımı.
+* **JavaScript (ES6+):** Asenkron veri çekme (Fetch API) ve dinamik DOM yönetimi.
+* **Leaflet.js:** İnteraktif harita katmanları ve özel ikon yönetimi.
 
-## ⚖️ Veri Kaynağı ve Lisans
+### Backend
+* **Node.js & Express.js:** API rotalarının yönetimi ve belediye servisleriyle haberleşme.
+* **CORS:** Tarayıcı tabanlı güvenlik politikalarının yönetimi.
 
-Bu projede kullanılan ESHOT otobüs durağı verileri, **İzmir Büyükşehir Belediyesi Açık Veri Portalı**'ndan temin edilmiştir.
+## 📋 Kurulum ve Çalıştırma
 
-Bu veriler, [Atıf 4.0 Uluslararası (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.tr) lisansı ile lisanslanmıştır. Bu lisans koşulları gereğince, verinin kaynağına atıf yapılmıştır.
+1.  **Bağımlılıkları Yükleyin:**
+    ```bash
+    npm install
+    ```
 
-## 🚀 Projeyi Başlatma
+2.  **Backend Sunucusunu Başlatın:**
+    ```bash
+    node index.js
+    ```
+    *Sunucu varsayılan olarak `http://127.0.0.1:3000` portunda çalışacaktır.*
 
-### 1. Kurulum
+3.  **Uygulamayı Açın:**
+    `public/index.html` dosyasını tarayıcınızda (Live Server önerilir) açın.
 
-Öncelikle gerekli bağımlılıkları (sadece `express`) yükleyin:
+## 🧮 Kullanılan Matematiksel Model (Haversine)
 
-```bash
-npm install express
-```
-(Not: Proje, Node.js 18+ sürümünde yerleşik olarak bulunan fetch API'sini kullanır. Daha eski bir Node sürümü kullanıyorsanız node-fetch gibi ek bir paket kurmanız gerekebilir.)
+İki koordinat arasındaki kuş uçuşu mesafe şu formülle hesaplanmaktadır:
 
-### 2. Veri Dosyası
+$$a = \sin^2(\Delta\varphi/2) + \cos \varphi_1 \cdot \cos \varphi_2 \cdot \sin^2(\Delta\lambda/2)$$
+$$c = 2 \cdot \operatorname{atan2}(\sqrt{a}, \sqrt{1-a})$$
+$$d = R \cdot c$$
 
-Projenin çalışması için ana dizinde `duraklar.json` adında bir dosya bulunmalıdır. Bu dosya, durak nesnelerinden oluşan bir dizi (array) içermelidir.
-
-**Örnek `duraklar.json` Yapısı:**
-
-```json
-[
-  {
-    "DURAK_ID": 10001,
-    "ADI": "ÖRNEK DURAK 1",
-    "ENLEM": 38.4192,
-    "BOYLAM": 27.1287,
-    "GECEN_HATLAR": ["10", "20", "90"]
-  },
-  {
-    "DURAK_ID": 10002,
-    "ADI": "ÖRNEK DURAK 2",
-    "ENLEM": 38.4205,
-    "BOYLAM": 27.1299,
-    "GECEN_HATLAR": ["15", "121", "550"]
-  }
-]
-```
-
-### 3. Sunucuyu Çalıştırma
-
-Sunucuyu başlatmak için (dosya adınızın `app.js` veya `index.js` olduğunu varsayarak):
-
-```bash
-node app.js
-```
-
-Sunucu varsayılan olarak `http://localhost:3000` adresinde çalışmaya başlayacaktır.
+## 👨‍💻 Geliştirici
+**[Çağdaş Çalayır](https://ccalayir.github.io/calayir-portfolio/)** - *Bilişim Sistemleri Mühendisi Adayı*
 
 ---
-
-## 📍 API Uç Noktaları (Endpoints)
-
-API, aşağıdaki uç noktaları sağlar:
-
-### 1. API Durum Kontrolü
-
-Sunucunun ayakta olup olmadığını kontrol eder.
-
-* **Endpoint:** `GET /`
-* **Başarılı Yanıt (200 OK):**
-    ```
-    bağlantı başarılı
-    ```
-
-### 2. Tüm Durakları Listeleme
-
-Sistemde kayıtlı tüm otobüs duraklarının listesini döndürür.
-
-* **Endpoint:** `GET /app/stops/`
-* **Başarılı Yanıt (200 OK):**
-    ```json
-    {
-      "message": "Otobüs durağı listesi",
-      "count": 2,
-      "data": [
-        {
-          "DURAK_ID": 10001,
-          "ADI": "ÖRNEK DURAK 1",
-          "ENLEM": 38.4192,
-          "BOYLAM": 27.1287,
-          "GECEN_HATLAR": ["10", "20", "90"]
-        },
-        {
-          "DURAK_ID": 10002,
-          "ADI": "ÖRNEK DURAK 2",
-          "ENLEM": 38.4205,
-          "BOYLAM": 27.1299,
-          "GECEN_HATLAR": ["15", "121", "550"]
-        }
-      ]
-    }
-    ```
-
-### 3. ID'ye Göre Belirli Bir Durağı Getirme
-
-Parametre olarak gönderilen `DURAK_ID`'ye sahip durağın detaylarını getirir.
-
-* **Endpoint:** `GET /app/stops/:id`
-* **Örnek İstek:** `GET /app/stops/10001`
-* **Başarılı Yanıt (200 OK):**
-    ```json
-        {
-          "message": "Sardunya durağı.",
-          "bekleyenYolcuSayisi": 7,
-          "acikAdres": "222/11. Sokak, Yenigün Mahallesi, Buca, İzmir, Ege Bölgesi, 35390, Türkiye"
-        }
-    ```
-(Not: acikAdres alanı OpenStreetMap Nominatim API'sinden dinamik olarak çekilmektedir.)
-
-#### Hata Durumları (ID ile Sorgulama)
-
-* **Durak Bulunamazsa (404 Not Found):**
-    * *İstek:* `GET /app/stops/99999`
-    * *Yanıt:*
-        ```json
-        {
-          "message": "Aranan ID'de durak bulunamadı...",
-          "arananID": 99999
-        }
-        ```
-
-* **Geçersiz ID Formatı (400 Bad Request):**
-    * *İstek:* `GET /app/stops/abcde`
-    * *Yanıt:*
-        ```json
-        {
-          "message": "Lütfen geçerli bir sayı girin."
-        }
-        ```
+*Not: Bu uygulama eğitim amaçlı geliştirilmiş olup, veriler ESHOT Genel Müdürlüğü servislerinden anlık çekilmektedir.*
