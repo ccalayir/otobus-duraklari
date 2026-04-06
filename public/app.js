@@ -63,13 +63,29 @@ aramaButonu.addEventListener("click", async () => {
     otobusListeIcerik.innerHTML = '';
 
     try {
-        const response = await fetch(`/app/stops/${id}`);
+const response = await fetch(`https://otobus-duraklari.onrender.com/app/stops/${id}`);
         const data = await response.json();
 
         if (!response.ok) {
             sonucAlani.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
             return;
         }
+
+        // --- YENİ EKLENEN ADRES ÇEKME KODU ---
+        let acikAdres = "Adres aranıyor...";
+        try {
+            // İsteği artık Render sunucusu değil, kullanıcının tarayıcısı atıyor
+            const geoCevap = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${data.enlem}&lon=${data.boylam}`);
+            const geoVeri = await geoCevap.json();
+            if (geoVeri && geoVeri.display_name) {
+                acikAdres = geoVeri.display_name;
+            } else {
+                acikAdres = "Adres bulunamadı.";
+            }
+        } catch (error) {
+            acikAdres = "Harita servisine ulaşılamadı.";
+        }
+        // ------------------------------------
 
         // Durak Bilgilerini Yazdır
         let hatlarDizisi = data.gecen_hatlar ? (Array.isArray(data.gecen_hatlar) ? data.gecen_hatlar : data.gecen_hatlar.toString().split('-').map(h => h.trim())) : [];
@@ -79,7 +95,7 @@ aramaButonu.addEventListener("click", async () => {
             <div class="card border-success mt-3 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title text-success">${data.message}</h5>
-                    <p class="small mb-1"><strong>Adres:</strong> ${data.acikAdres}</p>
+                    <p class="small mb-1"><strong>Adres:</strong> ${acikAdres}</p>
                     <p class="small"><strong>Geçen Hatlar:</strong> ${hatlarHTML}</p>
                 </div>
             </div>

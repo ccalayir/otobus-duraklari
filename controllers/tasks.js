@@ -28,30 +28,29 @@ const getStops = async (req, res) => {
     });
   } else {
     let acikAdres = "Açık adres bilgisi alınamadı...";
-try {
-      const lat = durak.ENLEM;
-      const lon = durak.BOYLAM;
-      const geoApiUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
-      
-      // Oluşan URL'yi terminalde görelim
-      console.log("İstek atılan URL:", geoApiUrl);
+const getStops = async (req, res) => {
+  const id = Number(req.params.id);
 
-      const response = await fetch(geoApiUrl, {
-        headers: {
-          "User-Agent": "ESHOT-Duraklari-API/1.0 (cagdas3515@proton.me)",
-        },
-      });
-
-      const geoData = await response.json();
-
-      if (geoData && geoData.display_name) {
-        acikAdres = geoData.display_name;
-      }
-    } catch (error) {
-      console.error("Nominatim API hatası: ", error.message);
-      // Hatanın altındaki asıl teknik sebebi görelim
-      console.error("Hatanın asıl sebebi: ", error.cause);
-    }
+  if (isNaN(id)) {
+    return res.status(400).json({ message: "Lütfen geçerli bir id girin.." });
+  }
+  const durak = tasksJSON.find((d) => d.DURAK_ID === id);
+  if (!durak) {
+    return res.status(404).json({
+      message: "Aranan ID'de durak bulunamadı..",
+      arananID: id,
+    });
+  } else {
+    // Adres bulma işini arayüze (frontend) devrettik
+    res.json({
+      message: `${durak.DURAK_ADI} durağı.`,
+      bekleyenYolcuSayisi: Math.round(Math.random() * 10),
+      gecen_hatlar: durak.DURAKTAN_GECEN_HATLAR,
+      enlem: durak.ENLEM,
+      boylam: durak.BOYLAM,
+    });
+  }
+};
 
     res.json({
       message: `${durak.DURAK_ADI} durağı.`,
