@@ -21,12 +21,5 @@ Projeyi bilgisayarınızda yerel olarak çalıştırmak için aşağıdaki adım
 3. `node index.js` komutu ile sunucuyu başlatın.
 4. Tarayıcınızda `http://localhost:3000` adresine giderek uygulamayı kullanabilirsiniz.
 
-## Kullanılan Matematiksel Model (Haversine)
-İki koordinat arasındaki kuş uçuşu mesafe uygulamada şu formülle hesaplanmaktadır:
-
-$$a = \sin^2(\Delta\varphi/2) + \cos \varphi_1 \cdot \cos \varphi_2 \cdot \sin^2(\Delta\lambda/2)$$
-$$c = 2 \cdot \operatorname{atan2}(\sqrt{a}, \sqrt{1-a})$$
-$$d = R \cdot c$$
-
 ## Geliştirici
 **[Çağdaş Çalayır](https://ccalayir.github.io/calayir-portfolio/)** - Bilişim Sistemleri Mühendisi Adayı
