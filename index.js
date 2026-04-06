@@ -8,6 +8,7 @@ const { getAllStops, getStops } = require("./controllers/tasks");
 
 // middleware
 app.use(express.json());
+app.use(express.static('public'));
 app.use(cors()); // En basit ve her şeye izin veren hali budur.
 
 //routes

@@ -24,7 +24,7 @@ function mesafeHesapla(lat1, lon1, lat2, lon2) {
 // Sayfa açıldığında tüm durakları çekip listeye doldurur
 async function duraklariYukle() {
     try {
-        const cevap = await fetch('https://otobus-duraklari.onrender.com/app/stops/all');
+        const cevap = await fetch('/app/stops/all');
         const veri = await cevap.json();
         tumDuraklar = veri.data;
 
@@ -63,7 +63,7 @@ aramaButonu.addEventListener("click", async () => {
     otobusListeIcerik.innerHTML = '';
 
     try {
-        const response = await fetch(`https://otobus-duraklari.onrender.com/app/stops/${id}`);
+        const response = await fetch(`/app/stops/${id}`);
         const data = await response.json();
 
         if (!response.ok) {
@@ -108,7 +108,7 @@ aramaButonu.addEventListener("click", async () => {
         if (hatlarDizisi.length > 0) {
             hatlarDizisi.forEach(async (hat) => {
                 try {
-                    const oCevap = await fetch(`https://otobus-duraklari.onrender.com/app/stops/buses/${hat}`);
+                    const oCevap = await fetch(`/app/stops/buses/${hat}`);
                     const oVeri = await oCevap.json();
                     
                     if (oVeri.HataVarMi === false && Array.isArray(oVeri.HatOtobusKonumlari)) {
